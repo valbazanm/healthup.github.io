@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Tracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header Component -->
+    <div id="header" data-include="components/header.html"></div>
+
+    <main>
+        <h1>Progress Tracker</h1>
+        <p>Utiliza esta página para realizar un seguimiento de tu progreso en tus planes de comidas y entrenamientos.</p>
+        
+        <section>
+            <h2>Registro de Progreso</h2>
+            <form id="progress-form">
+                <label for="meal-plan">Selecciona tu plan de comidas:</label>
+                <select id="meal-plan" name="meal-plan">
+                    <option value="plan1">Plan de Comidas 1</option>
+                    <option value="plan2">Plan de Comidas 2</option>
+                    <option value="plan3">Plan de Comidas 3</option>
+                </select>
+
+                <label for="workout-plan">Selecciona tu plan de entrenamiento:</label>
+                <select id="workout-plan" name="workout-plan">
+                    <option value="workout1">Entrenamiento 1</option>
+                    <option value="workout2">Entrenamiento 2</option>
+                    <option value="workout3">Entrenamiento 3</option>
+                </select>
+
+                <label for="progress-notes">Notas sobre tu progreso:</label>
+                <textarea id="progress-notes" name="progress-notes" rows="4" placeholder="Escribe tus notas aquí..."></textarea>
+
+                <button type="submit">Guardar Progreso</button>
+            </form>
+        </section>
+
+        <section>
+            <h2>Gráficos de Progreso</h2>
+            <div id="progress-chart">
+                <!-- Aquí se pueden incluir gráficos de progreso -->
+                <p>Gráficos de progreso se mostrarán aquí.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Component -->
+    <div id="footer" data-include="components/footer.html"></div>
+
+    <script src="js/nav.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

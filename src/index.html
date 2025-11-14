@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planes de Comidas y Entrenamientos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="site-header sticky-header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo" style="display:flex;align-items:center;gap:10px;">
+                <img src="../logo.png" alt="HealthUp logo" style="height:38px;width:38px;vertical-align:middle;border-radius:8px;">
+                <span>
+                    HealthUp
+                    <span class="tagline" style="display:block;">Tu salud, tu plan — simple y accesible</span>
+                </span>
+            </a>
+            <nav class="main-nav" aria-label="Menú principal">
+                <button class="nav-toggle" aria-label="Abrir menú">&#9776;</button>
+                <ul>
+                    <li><a href="profile.html">Sobre Nosotros</a></li>
+                    <li><a href="contact.html">Contacto</a></li>
+                    <li><a href="meal-plans.html">Planes</a></li>
+                    <li><a href="bodyfat.html">Calculadora de Grasa</a></li>
+                </ul>
+            </nav>
+            <div class="auth" id="authArea">
+                <!-- El botón de login o el menú de usuario se inyectan por JS -->
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero fancy-hero-bg">
+            <div class="hero-inner container">
+                <div class="hero-copy">
+                    <h1 class="hero-main-title">Transforma tu cuerpo y tu alimentación</h1>
+                    <p class="lead hero-lead">
+                        Empezá tu camino hacia una vida más saludable con planes adaptados a vos.<br>
+                        Con nuestro plan gratuito, ingresá tu peso y altura para obtener una estimación de tu porcentaje de grasa corporal y recibir recomendaciones iniciales.<br>
+                        Si buscás algo más avanzado, nuestro plan personalizado con IA te ayuda a alcanzar tus objetivos con un enfoque integral y adaptado a tus necesidades.
+                    </p>
+                    <a href="meal-plans.html" class="button primary hero-btn">Comenzar</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL LOGIN -->
+    <div id="authModal" class="modal-bg" style="display:none;">
+        <div class="modal-box">
+            <button class="modal-close" id="closeModalBtn" aria-label="Cerrar">&times;</button>
+            <div id="loginFormBox">
+                <h2>Iniciar sesión</h2>
+                <form class="auth-form" autocomplete="off">
+                    <div class="form-row">
+                        <label for="login-username">Usuario</label>
+                        <input id="login-username" name="username" type="text" autocomplete="username" placeholder="Usuario">
+                    </div>
+                    <div class="form-row">
+                        <label for="login-password">Contraseña</label>
+                        <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Contraseña">
+                    </div>
+                    <div class="form-row">
+                        <button type="submit" class="button primary" style="width:100%;">Ingresar</button>
+                    </div>
+                </form>
+                <div class="modal-switch">
+                    ¿No tienes cuenta? <a href="register.html" id="showRegister">Registrate aquí</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- FIN MODAL -->
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 HealthUp. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    <script src="js/scripts.js"></script>
+    <script src="js/nav.js"></script>
+    <script src="js/auth-modal.js"></script>
+    <script>
+    // Mostrar menú usuario si está logueado
+    function renderUserMenu() {
+        const authArea = document.getElementById('authArea');
+        const username = localStorage.getItem('fitlife_logged');
+        let users = JSON.parse(localStorage.getItem('fitlife_users') || '[]');
+        let user = users.find(u => u.username === username);
+        if (user) {
+            authArea.innerHTML = `
+                <div class="user-menu">
+                    <button class="user-avatar" id="userAvatarBtn" aria-label="Perfil">
+                        <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=181f1a&color=7bed9f&rounded=true&size=48" alt="Avatar" />
+                    </button>
+                    <div class="user-dropdown" id="userDropdown" style="display:none;">
+                        <div class="user-info">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=181f1a&color=7bed9f&rounded=true&size=64" alt="Avatar" />
+                            <div>
+                                <div class="user-name">${user.username}</div>
+                                <div class="user-email">${user.email}</div>
+                            </div>
+                        </div>
+                        <a href="profile.html" class="user-profile-link">Ver perfil</a>
+                        <button id="logoutBtn" class="user-logout">Cerrar sesión</button>
+                    </div>
+                </div>
+            `;
+            // Dropdown logic
+            const avatarBtn = document.getElementById('userAvatarBtn');
+            const dropdown = document.getElementById('userDropdown');
+            avatarBtn.onclick = function(e) {
+                e.stopPropagation();
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            };
+            document.body.addEventListener('click', function() {
+                dropdown.style.display = 'none';
+            });
+            document.getElementById('logoutBtn').onclick = function() {
+                localStorage.removeItem('fitlife_logged');
+                location.reload();
+            };
+        } else {
+            // Asegura que el botón tenga SIEMPRE el id loginBtn
+            authArea.innerHTML = `<a href="#" class="btn login-btn" id="loginBtn">Iniciar sesión / Registrarse</a>`;
+            // Vuelve a enlazar el evento para el modal
+            setTimeout(() => {
+                const loginBtn = document.getElementById('loginBtn');
+                if (loginBtn) {
+                    loginBtn.onclick = function(e) {
+                        e.preventDefault();
+                        const modal = document.getElementById('authModal');
+                        if (modal) {
+                            modal.style.display = 'flex';
+                            document.body.style.overflow = 'hidden';
+                        }
+                    };
+                }
+            }, 50);
+        }
+    }
+    document.addEventListener('DOMContentLoaded', renderUserMenu);
+    window.addEventListener('storage', renderUserMenu);
+    </script>
+</body>
+</html>

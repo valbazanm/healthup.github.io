@@ -15,13 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Intentar registrar el usuario
             const result = window.Auth.register(username, email, password);
+            console.log('register.js - register result:', result);
             
             if (result.success) {
+                console.log('register.js - calling setSession for', username);
                 alert('¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.');
-                
+
                 // Hacer login automáticamente
-                window.Auth.setSession(username);
-                
+                const sessionResult = window.Auth.setSession(username);
+                console.log('register.js - setSession result:', sessionResult, 'current session:', window.Auth.getSession && window.Auth.getSession());
+
                 // Redirigir a index.html
                 setTimeout(() => {
                     window.location.href = 'index.html';

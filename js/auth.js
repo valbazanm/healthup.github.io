@@ -81,6 +81,7 @@ function registerUser(username, email, password) {
     
     users.push(newUser);
     saveUsers(users);
+    console.log('auth.js - new user saved:', newUser);
     
     return { success: true, user: newUser };
 }
@@ -88,11 +89,12 @@ function registerUser(username, email, password) {
 // Validar login
 function validateLogin(username, password) {
     const user = getUserByUsername(username);
-    
+    console.log('auth.js - validateLogin attempt for:', username, 'found user:', !!user);
     if (!user || user.password !== password) {
+        console.log('auth.js - validateLogin failed for:', username);
         return { success: false, error: 'Usuario o contraseña incorrectos' };
     }
-    
+    console.log('auth.js - validateLogin success for:', username);
     return { success: true, user };
 }
 

@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!target) return;
         e.preventDefault();
         if (!modal) return;
+        console.log('auth-modal.js - opening login modal');
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         if (loginError) loginError.style.display = 'none';
@@ -90,6 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = emailEl ? emailEl.value.trim() : '';
             const password = passwordEl ? passwordEl.value : '';
 
+            console.log('auth-modal.js - login submit:', { emailProvided: !!email });
+
             // Validar login usando el módulo Auth
             if (!window.Auth || !window.Auth.login) {
                 if (loginError) {
@@ -100,11 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const result = window.Auth.login(email, password);
+            console.log('auth-modal.js - Auth.login result:', result);
 
             if (result && result.success) {
                 // Establecer sesión con el username real del usuario
                 const uname = result.user && result.user.username ? result.user.username : email;
-                window.Auth.setSession(uname);
+                const setRes = window.Auth.setSession(uname);
+                console.log('auth-modal.js - setSession result:', setRes, 'session now:', window.Auth.getSession && window.Auth.getSession());
                 // Mostrar mensaje de éxito
                 if (loginError) loginError.style.display = 'none';
                 alert('¡Bienvenido, ' + (result.user && result.user.username ? result.user.username : email) + '!');

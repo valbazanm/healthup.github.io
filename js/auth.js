@@ -44,6 +44,13 @@ function getUserByUsername(username) {
     return users.find(u => u.username.toLowerCase() === username.toLowerCase());
 }
 
+// Obtener usuario por email
+function getUserByEmail(email) {
+    if (!email) return null;
+    const users = getAllUsers();
+    return users.find(u => (u.email || '').toLowerCase() === (email || '').toLowerCase());
+}
+
 // Registrar nuevo usuario
 function registerUser(username, email, password) {
     // Validaciones
@@ -87,14 +94,21 @@ function registerUser(username, email, password) {
 }
 
 // Validar login
-function validateLogin(username, password) {
-    const user = getUserByUsername(username);
-    console.log('auth.js - validateLogin attempt for:', username, 'found user:', !!user);
+function validateLogin(identifier, password) {
+    // identifier is expected to be an email (per new UX), but we support username fallback
+    let user = null;
+    if (identifier && identifier.includes('@')) {
+        user = getUserByEmail(identifier);
+    }
+    if (!user) {
+        user = getUserByUsername(identifier);
+    }
+    console.log('auth.js - validateLogin attempt for:', identifier, 'found user:', !!user);
     if (!user || user.password !== password) {
-        console.log('auth.js - validateLogin failed for:', username);
+        console.log('auth.js - validateLogin failed for:', identifier);
         return { success: false, error: 'Usuario o contraseña incorrectos' };
     }
-    console.log('auth.js - validateLogin success for:', username);
+    console.log('auth.js - validateLogin success for:', user.username);
     return { success: true, user };
 }
 

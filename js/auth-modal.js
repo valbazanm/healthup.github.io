@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div id="loginError" style="color:#ff6b6b;margin-bottom:12px;display:none;"></div>
                     <form class="auth-form" id="loginForm" autocomplete="off">
                         <div class="form-row">
-                            <label for="login-username">Usuario</label>
-                            <input id="login-username" name="username" type="text" autocomplete="username" placeholder="Usuario">
+                            <label for="login-email">Email</label>
+                            <input id="login-email" name="email" type="email" autocomplete="email" placeholder="correo@ejemplo.com">
                         </div>
                         <div class="form-row">
                             <label for="login-password">Contraseña</label>
@@ -85,9 +85,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         newForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const usernameEl = document.getElementById('login-username');
+            const emailEl = document.getElementById('login-email');
             const passwordEl = document.getElementById('login-password');
-            const username = usernameEl ? usernameEl.value.trim() : '';
+            const email = emailEl ? emailEl.value.trim() : '';
             const password = passwordEl ? passwordEl.value : '';
 
             // Validar login usando el módulo Auth
@@ -99,14 +99,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const result = window.Auth.login(username, password);
+            const result = window.Auth.login(email, password);
 
             if (result && result.success) {
-                // Establecer sesión
-                window.Auth.setSession(username);
+                // Establecer sesión con el username real del usuario
+                const uname = result.user && result.user.username ? result.user.username : email;
+                window.Auth.setSession(uname);
                 // Mostrar mensaje de éxito
                 if (loginError) loginError.style.display = 'none';
-                alert('¡Bienvenido, ' + username + '!');
+                alert('¡Bienvenido, ' + (result.user && result.user.username ? result.user.username : email) + '!');
                 // Cerrar modal
                 if (modal) modal.style.display = 'none';
                 document.body.style.overflow = '';

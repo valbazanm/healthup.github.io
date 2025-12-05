@@ -6,6 +6,7 @@
     --accent-green2: #38f9d7;
     --muted: #e2fbe0;
     --container-width: 1100px;
+    --container-width: 1200px;
     --header-bg: rgba(10,10,10,0.97);
     --header-shadow: 0 2px 16px 0 rgba(67,233,123,0.06);
     --hero-gradient: linear-gradient(120deg, #0b0b0b 0%, #181f1a 100%);
@@ -45,6 +46,9 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 18px 0;
+    gap: 18px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
 }
 .logo {
     font-weight: 700;
@@ -52,6 +56,9 @@ body {
     font-size: 1.35rem;
     text-decoration: none;
     letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 .logo .tagline {
     display: block;
@@ -60,6 +67,7 @@ body {
     color: rgba(123,237,159,0.7);
     margin-top: 4px;
     letter-spacing: 0;
+    white-space: nowrap;
 }
 .main-nav {
     position: relative;
@@ -71,14 +79,19 @@ body {
     display: flex;
     gap: 12px;
     background: none;
+    align-items: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: auto;
 }
 .main-nav a {
     color: var(--muted);
     text-decoration: none;
-    padding: 8px 16px;
+    padding: 6px 10px;
     border-radius: 8px;
     transition: background .18s,color .18s;
     font-weight: 500;
+    line-height: 1.1;
 }
 .main-nav a:hover {
     background: rgba(67,233,123,0.10);
@@ -95,6 +108,9 @@ body {
 }
 .auth {
     margin-left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 .btn {
     display: inline-block;
@@ -107,6 +123,13 @@ body {
     border: 1px solid rgba(123,237,159,0.18);
     color: var(--muted);
     transition: background 0.18s, color 0.18s, border 0.18s;
+    padding: 8px 16px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    line-height: 1;
 }
 .login-btn:hover {
     background: rgba(67,233,123,0.10);
@@ -135,6 +158,10 @@ body {
         display: inline-block;
     }
 }
+
+/* Extra: ensure auth area doesn't wrap */
+.site-header .auth, .site-header .main-nav, .site-header .logo { min-width: 0; }
+.site-header .header-inner > * { flex-shrink: 0; }
 
 /* Hero / Presentation aesthetic */
 .hero {
@@ -600,4 +627,77 @@ footer {
 @media (max-width:900px){
     .plans-grid.big { flex-direction: column; align-items: center; gap: 28px; }
     .plan-card.featured { max-width: 95%; }
+}
+
+/* Estilos mejorados para botones del perfil */
+button[style*="background:linear-gradient"],
+a[style*="background:linear-gradient"] {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+}
+
+button[style*="background:linear-gradient"]:hover,
+a[style*="background:linear-gradient"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+button[style*="background:linear-gradient"]:active,
+a[style*="background:linear-gradient"]:active {
+    transform: translateY(0px);
+}
+
+/* Hover effects para botones específicos */
+#changePasswordBtn:hover {
+    background: linear-gradient(135deg, #5a4a3a, #4a3a2a) !important;
+    box-shadow: 0 8px 16px rgba(240, 184, 127, 0.2) !important;
+}
+
+#logoutBtn:hover {
+    background: linear-gradient(135deg, #5a3a3a, #4a2a2a) !important;
+    box-shadow: 0 8px 16px rgba(255, 107, 107, 0.2) !important;
+}
+
+/* Modal de cambiar contraseña */
+#changePasswordModal {
+    display: none !important;
+}
+
+#changePasswordModal[style*="display: flex"] {
+    display: flex !important;
+}
+
+/* Input styling */
+input[type="password"] {
+    transition: all 0.3s ease;
+}
+
+input[type="password"]:focus {
+    outline: none;
+    border-color: rgba(123, 237, 159, 0.6) !important;
+    background: #0b0b0b !important;
+    box-shadow: 0 0 12px rgba(123, 237, 159, 0.1);
+}
+
+input[type="password"]::placeholder {
+    color: #666;
+}
+
+/* Botones del modal */
+#changePasswordForm button:hover {
+    transform: translateY(-2px);
+}
+
+#changePasswordForm button[type="submit"] {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+#changePasswordForm button[type="submit"]:hover {
+    background: linear-gradient(135deg, #8fce9f, #6fcb7f) !important;
+    box-shadow: 0 8px 16px rgba(127, 237, 159, 0.3) !important;
+}
+
+#changePasswordForm button[type="submit"]:active {
+    transform: translateY(0px);
 }

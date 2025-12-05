@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprobante | HealthUp</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="site-header sticky-header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+                <img src="img/logo.png" alt="HealthUp logo" style="height:38px;width:38px;vertical-align:middle;border-radius:8px;flex-shrink:0;">
+                <div style="display:flex;flex-direction:column;line-height:1;">
+                    <span style="font-weight:700;font-size:1.5rem;line-height:1;">HealthUp</span>
+                    <span class="tagline" style="font-size:0.95rem;color:#7bed9f;line-height:1.2;">Tu salud, tu plan — simple y accesible</span>
+                </div>
+            </a>
+            <nav class="main-nav" aria-label="Menú principal">
+                <button class="nav-toggle" aria-label="Abrir menú">&#9776;</button>
+                <ul>
+                    <li><a href="about.html">Sobre Nosotros</a></li>
+                    <li><a href="contact.html">Contacto</a></li>
+                    <li><a href="meal-plans.html">Planes</a></li>
+                    <li><a href="bodyfat.html">Calculadora de Grasa</a></li>
+                    <li><a href="upgrade.html">Premium</a></li>
+                </ul>
+            </nav>
+            <div class="auth" id="authArea">
+                <!-- El botón de login o el menú de usuario se inyectan por JS -->
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="receipt-section">
+            <div class="container" style="max-width:720px;">
+                <h1>Comprobante de Pago</h1>
+                <div id="receiptBox" style="margin-top:18px;">
+                    <!-- Contenido generado por JS -->
+                </div>
+                <div style="margin-top:18px;">
+                    <a href="profile.html" class="button">Ir a mi perfil</a>
+                    <a href="index.html" class="button">Volver al inicio</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 HealthUp. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const box = document.getElementById('receiptBox');
+            const raw = localStorage.getItem('healthup_last_receipt');
+            if (!raw) {
+                box.innerHTML = '<p>No se encontró ningún comprobante reciente.</p>';
+                return;
+            }
+            const r = JSON.parse(raw);
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
+            if (!user || user.username !== r.username) {
+                box.innerHTML = '<p>No se encontró ningún comprobante para tu cuenta. Si realizaste el pago en otra sesión, inicia sesión con la cuenta correspondiente.</p>';
+                return;
+            }
+            box.innerHTML = `
+                <div style="padding:18px;border:1px solid rgba(0,0,0,0.06);border-radius:8px;background:#0e0e0e;">
+                    <p><strong>Usuario:</strong> ${r.username}</p>
+                    <p><strong>Email:</strong> ${r.email}</p>
+                    <p><strong>Descripción:</strong> ${r.description}</p>
+                    <p><strong>Monto:</strong> $${r.amount} ${r.currency}</p>
+                    <p><strong>Método:</strong> ${r.method}</p>
+                    <p><strong>Tarjeta:</strong> **** **** **** ${r.cardLast4}</p>
+                    <p><strong>Fecha:</strong> ${new Date(r.date).toLocaleString()}</p>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>

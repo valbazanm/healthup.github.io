@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>IA - Personalización | HealthUp</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .ai-container{max-width:1000px;margin:36px auto;padding:24px}
+        .ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+        .card{background:#070707;padding:18px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+        .chat-box{height:420px;overflow:auto;padding:12px;border-radius:8px;background:#0b0b0b;border:1px solid rgba(255,255,255,0.03)}
+        .msg{margin-bottom:12px}
+        .msg.user{color:#b6eec6;text-align:right}
+        .msg.ai{color:#bfe1ff;text-align:left}
+        label{display:block;margin-bottom:6px}
+        input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:#0b0b0b;color:var(--muted)}
+        .tabs{display:flex;gap:8px;margin-bottom:12px}
+        .tab{padding:8px 12px;border-radius:8px;cursor:pointer}
+        .tab.active{background:linear-gradient(135deg,#7bed9f,#5fb582);color:#070707}
+    </style>
+</head>
+<body>
+    <header class="site-header sticky-header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+                <img src="img/logo.png" alt="HealthUp logo" style="height:38px;width:38px;vertical-align:middle;border-radius:8px;flex-shrink:0;">
+                <div style="display:flex;flex-direction:column;line-height:1;">
+                    <span style="font-weight:700;font-size:1.5rem;line-height:1;">HealthUp</span>
+                    <span class="tagline" style="font-size:0.95rem;color:#7bed9f;line-height:1.2;">Tu salud, tu plan — simple y accesible</span>
+                </div>
+            </a>
+            <nav class="main-nav" aria-label="Menú principal">
+                <button class="nav-toggle" aria-label="Abrir menú">&#9776;</button>
+                <ul>
+                    <li><a href="about.html">Sobre Nosotros</a></li>
+                    <li><a href="contact.html">Contacto</a></li>
+                    <li><a href="meal-plans.html">Planes</a></li>
+                    <li><a href="bodyfat.html">Calculadora de Grasa</a></li>
+                    <li><a href="upgrade.html">Premium</a></li>
+                </ul>
+            </nav>
+            <div class="auth" id="authArea"></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="ai-container">
+            <h1>Asistente IA</h1>
+            <p>Sección disponible solo para usuarios Premium. Aquí podés cargar tus datos y conversar con la IA para obtener un plan personalizado.</p>
+
+            <div class="tabs" role="tablist">
+                <div class="tab active" data-target="profileTab">Perfil para IA</div>
+                <div class="tab" data-target="chatTab">Chat con IA</div>
+            </div>
+
+            <div id="content">
+                <div id="profileTab">
+                    <div class="ai-grid">
+                        <div class="card">
+                            <h3>Datos personales y físico</h3>
+                            <form id="aiProfileForm">
+                                <label>Edad <input type="number" id="ai_age" min="10" max="100"></label>
+                                <label>Sexo <select id="ai_sex"><option value="M">Masculino</option><option value="F">Femenino</option><option value="O">Otro</option></select></label>
+                                <label>Peso (kg) <input type="number" id="ai_weight" step="0.1"></label>
+                                <label>Altura (cm) <input type="number" id="ai_height"></label>
+                                <label>Objetivo <select id="ai_goal"><option value="mantener">Mantener peso</option><option value="perder">Perder peso</option><option value="ganar">Ganar masa</option></select></label>
+                                <hr>
+                                <h4>Horario y disponibilidad</h4>
+                                <label>Hora preferida para entrenar <input type="time" id="ai_train_time"></label>
+                                <label>Tiempo disponible para entrenar (minutos/día) <input type="number" id="ai_train_time_minutes" min="0"></label>
+                                <label>Tiempo disponible para cocinar (minutos/día) <input type="number" id="ai_cook_time_minutes" min="0"></label>
+                                <hr>
+                                <h4>Comidas</h4>
+                                <label>Comidas preferidas (separadas por comas) <input id="ai_likes" placeholder="ej: pollo, arroz, pasta"></label>
+                                <label>Alimentos que no te gustan (comas) <input id="ai_dislikes" placeholder="ej: pescado"></label>
+                                <label>Alergias / intolerancias <input id="ai_allergies" placeholder="ej: maní, gluten"></label>
+                                <hr>
+                                <div style="display:flex;gap:8px;margin-top:12px;">
+                                    <button id="saveAiProfile" class="button primary" type="button">Guardar perfil</button>
+                                    <button id="resetAiProfile" class="button" type="button">Restablecer</button>
+                                </div>
+                                <div id="aiMsg" style="margin-top:12px;color:var(--accent)"></div>
+                            </form>
+                        </div>
+
+                        <div class="card">
+                            <h3>Resumen rápido</h3>
+                            <div id="aiSummary">Cargá tus datos y la IA generará un resumen y recomendaciones aquí.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chatTab" style="display:none;">
+                    <div class="card" style="margin-bottom:12px;">
+                        <h3>Chat con la IA</h3>
+                        <div class="chat-box" id="chatBox"></div>
+                        <div style="display:flex;gap:8px;margin-top:8px;">
+                            <input id="chatInput" placeholder="Escribí tu mensaje...">
+                            <button id="sendMsg" class="button primary">Enviar</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h4>Uso sugerido</h4>
+                        <p>Ejemplos: "Generame un plan semanal para perder 3kg en 2 meses", "Dame recetas rápidas con pollo y arroz"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 HealthUp. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        // Tabs
+        document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', function(){
+            document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById('profileTab').style.display = this.dataset.target === 'profileTab' ? '' : 'none';
+            document.getElementById('chatTab').style.display = this.dataset.target === 'chatTab' ? '' : 'none';
+        }));
+
+        // Load and save IA profile per user
+        function loadAIProfile() {
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
+            if (!user) {
+                document.body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--accent);">Debes iniciar sesión y ser Premium para acceder a esta sección.</div>';
+                return;
+            }
+            if (user.plan !== 'pago') {
+                document.body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--accent);">Esta sección está disponible solo para usuarios Premium.</div>';
+                return;
+            }
+            const profile = window.Auth.getAIProfile ? window.Auth.getAIProfile(user.username) : null;
+            if (profile) {
+                document.getElementById('ai_age').value = profile.age || '';
+                document.getElementById('ai_sex').value = profile.sex || 'M';
+                document.getElementById('ai_weight').value = profile.weight || '';
+                document.getElementById('ai_height').value = profile.height || '';
+                document.getElementById('ai_goal').value = profile.goal || 'mantener';
+                document.getElementById('ai_train_time').value = profile.train_time || '';
+                document.getElementById('ai_train_time_minutes').value = profile.train_minutes || '';
+                document.getElementById('ai_cook_time_minutes').value = profile.cook_minutes || '';
+                document.getElementById('ai_likes').value = (profile.likes || []).join(', ');
+                document.getElementById('ai_dislikes').value = (profile.dislikes || []).join(', ');
+                document.getElementById('ai_allergies').value = (profile.allergies || []).join(', ');
+                renderSummary(profile);
+            }
+        }
+
+        function renderSummary(profile) {
+            const s = [];
+            if (!profile) { document.getElementById('aiSummary').innerText = 'No hay datos cargados.'; return; }
+            s.push(`Objetivo: ${profile.goal || 'N/A'}`);
+            s.push(`Peso/Altura: ${profile.weight || '?'} kg / ${profile.height || '?'} cm`);
+            s.push(`Entrena a las: ${profile.train_time || 'no especificado'} por ${profile.train_minutes || 0} min`);
+            s.push(`Tiempo para cocinar: ${profile.cook_minutes || 0} min`);
+            s.push(`Preferencias: ${ (profile.likes||[]).slice(0,5).join(', ') || 'Ninguna' }`);
+            document.getElementById('aiSummary').innerText = s.join('\n');
+        }
+
+        document.getElementById('saveAiProfile').addEventListener('click', function(){
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
+            if (!user) return alert('Inicia sesión');
+            const data = {
+                age: document.getElementById('ai_age').value,
+                sex: document.getElementById('ai_sex').value,
+                weight: document.getElementById('ai_weight').value,
+                height: document.getElementById('ai_height').value,
+                goal: document.getElementById('ai_goal').value,
+                train_time: document.getElementById('ai_train_time').value,
+                train_minutes: document.getElementById('ai_train_time_minutes').value,
+                cook_minutes: document.getElementById('ai_cook_time_minutes').value,
+                likes: document.getElementById('ai_likes').value.split(',').map(s=>s.trim()).filter(Boolean),
+                dislikes: document.getElementById('ai_dislikes').value.split(',').map(s=>s.trim()).filter(Boolean),
+                allergies: document.getElementById('ai_allergies').value.split(',').map(s=>s.trim()).filter(Boolean),
+                savedAt: new Date().toISOString()
+            };
+            const res = window.Auth.saveAIProfile ? window.Auth.saveAIProfile(user.username, data) : { success:false };
+            if (res && res.success) {
+                document.getElementById('aiMsg').innerText = 'Perfil IA guardado correctamente.';
+                renderSummary(data);
+            } else {
+                document.getElementById('aiMsg').innerText = 'Error al guardar el perfil.';
+            }
+        });
+
+        document.getElementById('resetAiProfile').addEventListener('click', function(){
+            if (!confirm('Restablecer los datos IA eliminará la información actual. Continuar?')) return;
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
+            if (!user) return;
+            window.Auth.saveAIProfile(user.username, {});
+            location.reload();
+        });
+
+        // Chat simulation: use profile to craft simple responses
+        function appendMsg(text, cls) {
+            const box = document.getElementById('chatBox');
+            const d = document.createElement('div'); d.className = 'msg ' + cls; d.innerText = text; box.appendChild(d); box.scrollTop = box.scrollHeight;
+        }
+
+        document.getElementById('sendMsg').addEventListener('click', sendChat);
+        document.getElementById('chatInput').addEventListener('keydown', function(e){ if (e.key==='Enter') sendChat(); });
+
+        function sendChat() {
+            const text = document.getElementById('chatInput').value.trim();
+            if (!text) return;
+            appendMsg(text, 'user');
+            document.getElementById('chatInput').value = '';
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
+            const profile = user && window.Auth.getAIProfile ? window.Auth.getAIProfile(user.username) : null;
+            // Simulate thinking
+            appendMsg('La IA está procesando tu petición...', 'ai');
+            setTimeout(()=>{
+                // remove processing msg
+                const box = document.getElementById('chatBox');
+                const nodes = box.querySelectorAll('.msg.ai');
+                if (nodes.length) nodes[nodes.length-1].remove();
+                // Create a faux response using profile
+                let resp = 'Basado en tus datos, te recomiendo: ';
+                if (profile) {
+                    if (profile.goal === 'perder') resp += 'un plan hipocalórico con énfasis en proteínas magras.';
+                    else if (profile.goal === 'ganar') resp += 'aumentar calorías y priorizar entrenamientos de fuerza.';
+                    else resp += 'mantener una dieta balanceada y ejercicios mixtos.';
+                    if ((profile.likes||[]).length) resp += ' Puedo incluir ' + (profile.likes.slice(0,3).join(', ')) + ' en tus recetas.';
+                } else {
+                    resp += 'necesito que completes tu perfil IA para recomendaciones personalizadas.';
+                }
+                appendMsg(resp, 'ai');
+            }, 850);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAIProfile);
+    </script>
+</body>
+</html>

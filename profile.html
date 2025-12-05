@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobre Nosotros | HealthUp</title>
+    <title>Mi Perfil | HealthUp</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -19,10 +19,11 @@
             <nav class="main-nav" aria-label="Menú principal">
                 <button class="nav-toggle" aria-label="Abrir menú">&#9776;</button>
                 <ul>
-                    <li><a href="profile.html">Sobre Nosotros</a></li>
+                    <li><a href="about.html">Sobre Nosotros</a></li>
                     <li><a href="contact.html">Contacto</a></li>
                     <li><a href="meal-plans.html">Planes</a></li>
                     <li><a href="bodyfat.html">Calculadora de Grasa</a></li>
+                    <li><a href="upgrade.html">Premium</a></li>
                 </ul>
             </nav>
             <div class="auth" id="authArea">
@@ -31,33 +32,42 @@
         </div>
     </header>
     <main>
-        <section class="about-section container" id="aboutSection">
-            <h1>Sobre HealthUp</h1>
-            <p class="about-lead">
-                En HealthUp creemos que cada persona merece un plan de bienestar adaptado a su realidad. Somos un equipo multidisciplinario de profesionales de la salud, tecnología y nutrición, comprometidos con acercar soluciones accesibles y personalizadas para mejorar la calidad de vida de nuestros usuarios.
-            </p>
-            <h2>Nuestra misión</h2>
-            <p>
-                Democratizar el acceso a planes de alimentación y entrenamiento, combinando ciencia, tecnología e inteligencia artificial para que cualquier persona pueda alcanzar sus objetivos de salud y bienestar, sin importar su punto de partida.
-            </p>
-            <h2>¿Quiénes somos?</h2>
-            <ul class="about-list">
-                <li><strong>Nutricionistas y entrenadores:</strong> Desarrollan y validan los planes y recomendaciones.</li>
-                <li><strong>Equipo de tecnología:</strong> Implementa la plataforma y la IA que personaliza cada experiencia.</li>
-                <li><strong>Soporte y comunidad:</strong> Acompañamos a cada usuario en su proceso, brindando motivación y seguimiento.</li>
-            </ul>
-            <h2>¿Por qué elegirnos?</h2>
-            <ul class="about-list">
-                <li>Planes gratuitos y personalizados según tus datos y preferencias.</li>
-                <li>Recomendaciones basadas en evidencia y adaptadas por IA.</li>
-                <li>Privacidad y confidencialidad de tus datos.</li>
-                <li>Desarrollado como proyecto académico para la facultad, con fines educativos y demostrativos.</li>
-            </ul>
+        <section class="about-section container" id="profileSection">
+            <h1 style="margin-bottom:32px;">Mi Perfil</h1>
+            <div id="profileData"></div>
+            
+            <!-- Modal de cambiar contraseña -->
+            <div id="changePasswordModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:1000;">
+                <div style="background:#070707;padding:40px;border-radius:12px;border:1px solid rgba(123,237,159,0.2);max-width:400px;width:90%;">
+                    <h2 style="color:var(--accent);margin-bottom:24px;">Cambiar Contraseña</h2>
+                    <div id="passwordError" style="color:#ff6b6b;margin-bottom:12px;display:none;padding:12px;background:rgba(255,107,107,0.1);border-radius:6px;"></div>
+                    
+                    <form id="changePasswordForm" style="display:flex;flex-direction:column;gap:16px;">
+                        <div>
+                            <label style="display:block;color:#b6eec6;margin-bottom:8px;font-weight:500;">Contraseña actual</label>
+                            <input type="password" id="currentPassword" placeholder="Tu contraseña actual" style="width:100%;padding:12px;border-radius:6px;border:1px solid rgba(123,237,159,0.3);background:#0b0b0b;color:#b6eec6;font-size:1rem;" required>
+                        </div>
+                        <div>
+                            <label style="display:block;color:#b6eec6;margin-bottom:8px;font-weight:500;">Nueva contraseña</label>
+                            <input type="password" id="newPassword" placeholder="Nueva contraseña (mínimo 4 caracteres)" style="width:100%;padding:12px;border-radius:6px;border:1px solid rgba(123,237,159,0.3);background:#0b0b0b;color:#b6eec6;font-size:1rem;" required>
+                        </div>
+                        <div>
+                            <label style="display:block;color:#b6eec6;margin-bottom:8px;font-weight:500;">Confirmar nueva contraseña</label>
+                            <input type="password" id="confirmPassword" placeholder="Confirma tu nueva contraseña" style="width:100%;padding:12px;border-radius:6px;border:1px solid rgba(123,237,159,0.3);background:#0b0b0b;color:#b6eec6;font-size:1rem;" required>
+                        </div>
+                        
+                        <div style="display:flex;gap:12px;margin-top:24px;">
+                            <button type="button" id="cancelPasswordBtn" style="flex:1;padding:12px;border-radius:6px;border:1px solid rgba(123,237,159,0.3);background:transparent;color:#b6eec6;font-weight:500;cursor:pointer;transition:all 0.3s;">Cancelar</button>
+                            <button type="submit" style="flex:1;padding:12px;border-radius:6px;border:none;background:linear-gradient(135deg, #7bed9f, #5fb582);color:#070707;font-weight:600;cursor:pointer;transition:all 0.3s;">Cambiar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </section>
-        <section class="about-section container" id="profileSection" style="display:none;">
-            <h1>Mi Perfil</h1>
-            <div id="profileData" style="font-size:1.15rem;line-height:2;margin-bottom:24px;"></div>
-            <button class="button primary" id="logoutBtn">Cerrar sesión</button>
+        <section class="about-section container" id="nologinSection" style="display:none;text-align:center;padding:60px 0;">
+            <h1 style="color:var(--accent);margin-bottom:24px;">Debes iniciar sesión para ver tu perfil</h1>
+            <p style="font-size:1.1rem;margin-bottom:24px;">Inicia sesión o registrate para acceder a tu perfil personal.</p>
+            <a href="index.html" style="display:inline-block;padding:12px 32px;border-radius:6px;background:linear-gradient(135deg, #7bed9f, #5fb582);color:#070707;text-decoration:none;font-weight:600;transition:all 0.3s;cursor:pointer;">Ir al inicio</a>
         </section>
     </main>
     <footer>
@@ -65,64 +75,201 @@
             <p>&copy; 2025 HealthUp. Todos los derechos reservados.</p>
         </div>
     </footer>
+    <script src="js/auth.js"></script>
     <script src="js/scripts.js"></script>
     <script src="js/nav.js"></script>
     <script src="js/auth-modal.js"></script>
     <script>
     // Mostrar perfil si está logueado
     function showProfile() {
-        const username = localStorage.getItem('fitlife_logged');
-        if (!username) {
-            document.getElementById('aboutSection').style.display = '';
-            document.getElementById('profileSection').style.display = 'none';
-            // Mensaje para no logueado
-            const about = document.getElementById('aboutSection');
-            let msg = document.getElementById('nologinmsg');
-            if (!msg) {
-                msg = document.createElement('div');
-                msg.id = 'nologinmsg';
-                msg.style = "margin:32px 0;text-align:center;";
-                msg.innerHTML = `<strong>Para ver tu perfil personal, <a href="#" id="loginBtnProfile" class="btn login-btn">iniciá sesión</a>.</strong>`;
-                about.appendChild(msg);
-            }
-            // Botón login funcional
-            setTimeout(() => {
-                const btn = document.getElementById('loginBtnProfile');
-                if (btn) {
-                    btn.onclick = function(e){ e.preventDefault(); document.getElementById('loginBtn').click(); };
-                }
-            }, 100);
-            return;
-        }
-        // Buscar usuario
-        let users = JSON.parse(localStorage.getItem('fitlife_users') || '[]');
-        let user = users.find(u => u.username === username);
+        const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
         if (!user) {
-            localStorage.removeItem('fitlife_logged');
-            location.reload();
+            document.getElementById('profileSection').style.display = 'none';
+            document.getElementById('nologinSection').style.display = '';
             return;
         }
-        document.getElementById('aboutSection').style.display = 'none';
         document.getElementById('profileSection').style.display = '';
+        document.getElementById('nologinSection').style.display = 'none';
         document.getElementById('profileData').innerHTML = `
-            <strong>Usuario:</strong> ${user.username}<br>
-            <strong>Email:</strong> ${user.email}<br>
-            <strong>Estado de cuenta:</strong> ${user.plan === 'pago' ? 'Plan de pago' : 'Plan gratuito'}
+            <div style="background:#0b0b0b;padding:30px;border-radius:12px;border:1px solid rgba(123,237,159,0.2);margin-bottom:32px;">
+                <div style="display:flex;align-items:center;margin-bottom:30px;gap:24px;">
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=181f1a&color=7bed9f&rounded=true&size=120" alt="Avatar" style="border-radius:8px;width:120px;height:120px;flex-shrink:0;" />
+                    <div>
+                        <div style="font-size:1.8rem;font-weight:bold;color:#7bed9f;margin-bottom:8px;">${user.username}</div>
+                        <div style="color:#b6eec6;margin-bottom:12px;font-size:1rem;">${user.email}</div>
+                        <div style="color:#888;font-size:0.95rem;">Miembro desde ${new Date(user.createdAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                    </div>
+                </div>
+                <hr style="border:none;border-top:1px solid rgba(123,237,159,0.15);margin:30px 0;" />
+                <div style="margin-top:30px;">
+                    <strong style="color:var(--accent);display:block;margin-bottom:16px;font-size:1.1rem;">Información de cuenta</strong>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                        <div>
+                            <p style="color:#888;font-size:0.9rem;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Usuario</p>
+                            <p style="color:#b6eec6;font-size:1.05rem;margin:0;">${user.username}</p>
+                        </div>
+                        <div>
+                            <p style="color:#888;font-size:0.9rem;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Email</p>
+                            <p style="color:#b6eec6;font-size:1.05rem;margin:0;">${user.email}</p>
+                        </div>
+                        <div>
+                            <p style="color:#888;font-size:0.9rem;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Plan</p>
+                            <p id="profilePlan" style="color:#7bed9f;font-size:1.05rem;margin:0;font-weight:500;">${user.plan && user.plan === 'pago' ? 'Premium' : 'Gratuito'}</p>
+                        </div>
+                        <div>
+                            <p style="color:#888;font-size:0.9rem;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Estado</p>
+                            <p style="color:#7bed9f;font-size:1.05rem;margin:0;font-weight:500;">Activo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <a href="index.html" style="flex:1;min-width:200px;padding:14px 24px;border-radius:8px;background:linear-gradient(135deg, #2a4a3a, #1a3a2a);color:#7bed9f;text-decoration:none;font-weight:600;text-align:center;border:1px solid rgba(123,237,159,0.3);transition:all 0.3s;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+                    <span>←</span> Volver al inicio
+                </a>
+                ${user.plan === 'pago' ? `
+                <a href="receipt.html" style="flex:1;min-width:200px;padding:14px 24px;border-radius:8px;background:linear-gradient(135deg,#2a9aef,#1e7bd6);color:#fff;text-decoration:none;font-weight:600;text-align:center;border:1px solid rgba(30,123,214,0.2);transition:all 0.3s;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">📄 Ver pago</a>
+                <button id="cancelSubscriptionBtn" style="flex:1;min-width:200px;padding:14px 24px;border-radius:8px;background:linear-gradient(135deg,#ef4a4a,#d63a3a);color:#fff;text-decoration:none;font-weight:600;text-align:center;border:1px solid rgba(255,107,107,0.2);transition:all 0.3s;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">✖ Cancelar suscripción</button>
+                ` : ''}
+                <button id="changePasswordBtn" style="flex:1;min-width:200px;padding:14px 24px;border-radius:8px;background:linear-gradient(135deg, #4a3a2a, #3a2a1a);color:#f0b87f;text-decoration:none;font-weight:600;text-align:center;border:1px solid rgba(240,184,127,0.3);transition:all 0.3s;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+                    <span>🔑</span> Cambiar contraseña
+                </button>
+                <button id="logoutBtn" style="flex:1;min-width:200px;padding:14px 24px;border-radius:8px;background:linear-gradient(135deg, #4a2a2a, #3a1a1a);color:#ff9999;text-decoration:none;font-weight:600;text-align:center;border:1px solid rgba(255,107,107,0.3);transition:all 0.3s;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+                    <span>🚪</span> Cerrar sesión
+                </button>
+            </div>
         `;
+        
+        // Eventos de los botones
+        document.getElementById('changePasswordBtn').onclick = function() {
+            document.getElementById('changePasswordModal').style.display = 'flex';
+        };
+        
         document.getElementById('logoutBtn').onclick = function() {
-            localStorage.removeItem('fitlife_logged');
+            if (window.Auth && window.Auth.logout) {
+                window.Auth.logout();
+            }
             location.reload();
         };
+        // Si existe el boton de cancelar suscripción, enlazar evento
+        const cancelBtn = document.getElementById('cancelSubscriptionBtn');
+        if (cancelBtn) {
+            cancelBtn.onclick = function() {
+                if (!confirm('¿Estás seguro que querés cancelar tu suscripción Premium?')) return;
+                const res = window.Auth.setUserPlan(user.username, 'gratis');
+                if (res && res.success) {
+                    alert('Tu suscripción fue cancelada. Tu cuenta ahora es Gratuita.');
+                    location.reload();
+                } else {
+                    alert('No se pudo cancelar la suscripción. Intenta nuevamente.');
+                }
+            };
+        }
+        // Añadir acceso rápido a configuración IA si es premium
+        const aiConfigBtn = document.getElementById('aiConfigBtn');
+        if (!aiConfigBtn && user.plan === 'pago') {
+            const wrapper = document.querySelector('#profileData > div + div') || document.querySelector('#profileData');
+            // Crear botón y añadirlo antes del changePasswordBtn
+            const btn = document.createElement('a');
+            btn.href = 'ai.html';
+            btn.id = 'aiConfigBtn';
+            btn.style.cssText = 'flex:1;min-width:200px;padding:14px 24px;border-radius:8px;background:linear-gradient(135deg,#7a4fe6,#5b3fd1);color:#fff;text-decoration:none;font-weight:600;text-align:center;border:1px solid rgba(91,63,209,0.2);transition:all 0.3s;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;';
+            btn.innerHTML = '🤖 Acceder a IA';
+            const actions = document.querySelector('#profileData div[style*="display:flex;gap:12px;"]');
+            if (actions) actions.insertBefore(btn, actions.children[1] || actions.firstChild);
+        }
     }
     document.addEventListener('DOMContentLoaded', showProfile);
     window.addEventListener('storage', showProfile);
     </script>
+    
+    <script>
+    // Manejo del modal de cambiar contraseña
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('changePasswordModal');
+        const form = document.getElementById('changePasswordForm');
+        const cancelBtn = document.getElementById('cancelPasswordBtn');
+        const errorDiv = document.getElementById('passwordError');
+        
+        // Cerrar modal
+        cancelBtn.onclick = function() {
+            modal.style.display = 'none';
+            form.reset();
+            errorDiv.style.display = 'none';
+        };
+        
+        // Cerrar modal al hacer click fuera
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                form.reset();
+                errorDiv.style.display = 'none';
+            }
+        };
+        
+        // Manejar submit del formulario
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // Validaciones básicas
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                errorDiv.textContent = 'Por favor completa todos los campos';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (newPassword.length < 4) {
+                errorDiv.textContent = 'La nueva contraseña debe tener al menos 4 caracteres';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                errorDiv.textContent = 'Las contraseñas no coinciden';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (currentPassword === newPassword) {
+                errorDiv.textContent = 'La nueva contraseña debe ser diferente a la actual';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Cambiar la contraseña usando el módulo Auth
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
+            if (!user) {
+                errorDiv.textContent = 'Usuario no encontrado';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Usar la función changePassword del módulo Auth
+            const result = window.Auth.changePassword(user.username, currentPassword, newPassword);
+            
+            if (!result.success) {
+                errorDiv.textContent = result.error || 'Error al cambiar la contraseña';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Éxito
+            alert('✅ Contraseña cambiada correctamente');
+            modal.style.display = 'none';
+            form.reset();
+            errorDiv.style.display = 'none';
+        };
+    });
+    </script>
     <script>
     function renderUserMenu() {
         const authArea = document.getElementById('authArea');
-        const username = localStorage.getItem('fitlife_logged');
-        let users = JSON.parse(localStorage.getItem('fitlife_users') || '[]');
-        let user = users.find(u => u.username === username);
+        const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
         if (user) {
             authArea.innerHTML = `
                 <div class="user-menu">
@@ -138,7 +285,7 @@
                             </div>
                         </div>
                         <a href="profile.html" class="user-profile-link">Ver perfil</a>
-                        <button id="logoutBtn" class="user-logout">Cerrar sesión</button>
+                        <button id="logoutBtn2" class="user-logout">Cerrar sesión</button>
                     </div>
                 </div>
             `;
@@ -151,10 +298,15 @@
             document.body.addEventListener('click', function() {
                 dropdown.style.display = 'none';
             });
-            document.getElementById('logoutBtn').onclick = function() {
-                localStorage.removeItem('fitlife_logged');
-                location.reload();
-            };
+            const logoutBtn2 = document.getElementById('logoutBtn2');
+            if (logoutBtn2) {
+                logoutBtn2.onclick = function() {
+                    if (window.Auth && window.Auth.logout) {
+                        window.Auth.logout();
+                    }
+                    location.reload();
+                };
+            }
         } else {
             authArea.innerHTML = `<a href="#" class="btn login-btn" id="loginBtn">Iniciar sesión / Registrarse</a>`;
             setTimeout(() => {

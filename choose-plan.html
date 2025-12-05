@@ -19,10 +19,11 @@
             <nav class="main-nav" aria-label="Menú principal">
                 <button class="nav-toggle" aria-label="Abrir menú">&#9776;</button>
                 <ul>
-                    <li><a href="profile.html">Sobre Nosotros</a></li>
+                    <li><a href="about.html">Sobre Nosotros</a></li>
                     <li><a href="contact.html">Contacto</a></li>
                     <li><a href="meal-plans.html">Planes</a></li>
                     <li><a href="bodyfat.html">Calculadora de Grasa</a></li>
+                    <li><a href="upgrade.html">Premium</a></li>
                 </ul>
             </nav>
             <div class="auth" id="authArea">
@@ -43,7 +44,7 @@
                             <li>Recomendaciones iniciales</li>
                             <li>Plan predeterminado según tus datos</li>
                         </ul>
-                        <button class="button primary" onclick="selectPlan('Gratis')">Elegir gratuito</button>
+                        <button class="button primary" id="btn-free" onclick="selectPlan('Gratis')">Comenzar aquí</button>
                     </article>
                     <article class="plan-card featured" id="plan-paid">
                         <h2>Pago</h2>
@@ -53,7 +54,7 @@
                             <li>Recomendaciones según tus objetivos</li>
                             <li>Seguimiento avanzado</li>
                         </ul>
-                        <button class="button primary" onclick="selectPlan('Pago')">Elegir pago</button>
+                        <button class="button primary" id="btn-paid" onclick="selectPlan('Pago')">Solicitar información</button>
                     </article>
                 </div>
                 <div id="plan-status" style="text-align:center;margin-top:32px;font-size:1.2rem;color:var(--accent);"></div>
@@ -65,32 +66,68 @@
             <p>&copy; 2025 HealthUp. Todos los derechos reservados.</p>
         </div>
     </footer>
+    <script src="js/auth.js"></script>
     <script src="js/scripts.js"></script>
     <script src="js/nav.js"></script>
     <script src="js/auth-modal.js"></script>
     <script>
-        // Obtener usuario de la URL
-        const params = new URLSearchParams(window.location.search);
-        const username = params.get('user');
-
         function selectPlan(tipo) {
-            document.getElementById('plan-status').innerText = "Seleccionaste el plan: " + tipo + ". Tu cuenta es " + (tipo === "Pago" ? "de pago" : "gratuita") + ".";
-            // Guardar el plan en el usuario
-            if (username) {
-                let users = JSON.parse(localStorage.getItem('fitlife_users') || '[]');
-                let idx = users.findIndex(u => u.username === username);
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
+            if (tipo === "Pago") {
+                alert("Gracias por tu interés en el plan Premium. Nos pondremos en contacto pronto con más información.");
+                return;
+            }
+            if (user) {
+                let users = window.Auth.getAllUsers();
+                let idx = users.findIndex(u => u.username === user.username);
                 if (idx !== -1) {
-                    users[idx].plan = tipo === "Pago" ? "pago" : "gratis";
-                    localStorage.setItem('fitlife_users', JSON.stringify(users));
+                    users[idx].plan = "gratis";
+                    localStorage.setItem('healthup_users', JSON.stringify(users));
+                    document.getElementById('plan-status').innerText = "✅ Plan gratuito activado. Accede a la calculadora de grasa corporal.";
+                }
+            } else {
+                alert("Por favor inicia sesión para continuar.");
+            }
+        }
+
+        function updatePlanButtons() {
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
+            console.log('updatePlanButtons - user:', user);
+            const btnFree = document.getElementById('btn-free');
+            const btnPaid = document.getElementById('btn-paid');
+            
+            if (user) {
+                // Usuario logueado: ocultar botón de gratuito
+                if (btnFree) {
+                    btnFree.style.display = 'none';
+                }
+                // Cambiar botón de pago a "Solicitar información"
+                if (btnPaid) {
+                    btnPaid.textContent = '📧 Solicitar información';
+                }
+            } else {
+                // Usuario NO logueado: mostrar botón de gratuito
+                if (btnFree) {
+                    btnFree.style.display = 'block';
+                    btnFree.textContent = 'Comenzar aquí';
+                }
+                // Cambiar botón de pago a "Elegir pago"
+                if (btnPaid) {
+                    btnPaid.textContent = 'Elegir pago';
                 }
             }
         }
 
+        // Si el DOM ya cargó (scripts colocados al final), aseguramos la actualización
+        if (typeof renderUserMenu === 'function') renderUserMenu();
+        updatePlanButtons();
+        // Ejecutar otra vez después de un pequeño retardo por si el Auth se inicializa un poco más tarde
+        setTimeout(updatePlanButtons, 150);
+        window.addEventListener('storage', updatePlanButtons);
+
         function renderUserMenu() {
             const authArea = document.getElementById('authArea');
-            const username = localStorage.getItem('fitlife_logged');
-            let users = JSON.parse(localStorage.getItem('fitlife_users') || '[]');
-            let user = users.find(u => u.username === username);
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
             if (user) {
                 authArea.innerHTML = `
                     <div class="user-menu">
@@ -120,7 +157,9 @@
                     dropdown.style.display = 'none';
                 });
                 document.getElementById('logoutBtn').onclick = function() {
-                    localStorage.removeItem('fitlife_logged');
+                    if (window.Auth && window.Auth.logout) {
+                        window.Auth.logout();
+                    }
                     location.reload();
                 };
             } else {

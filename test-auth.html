@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test del Sistema de Autenticación</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .test-section { 
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test { margin-bottom: 15px; }
+        .test-result { 
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .pass { 
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .fail { 
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px 5px 5px 0;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        .data-display {
+            background: #f9f9f9;
+            padding: 10px;
+            border-left: 3px solid #007bff;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test del Sistema de Autenticación HealthUp</h1>
+        
+        <div class="test-section">
+            <h2>1. Verificación de Inicialización</h2>
+            <div class="test">
+                <button onclick="testInit()">Ejecutar Test</button>
+                <div id="result-init"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Verificación de Usuarios pre-cargados</h2>
+            <div class="test">
+                <button onclick="testPreloadedUsers()">Ejecutar Test</button>
+                <div id="result-preloaded"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Prueba de Login</h2>
+            <div class="test">
+                <button onclick="testLoginSuccess()">Probar Login Correcto</button>
+                <button onclick="testLoginFail()">Probar Login Incorrecto</button>
+                <div id="result-login"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. Prueba de Registro</h2>
+            <div class="test">
+                <button onclick="testRegister()">Probar Registro</button>
+                <button onclick="testRegisterDuplicate()">Probar Usuario Duplicado</button>
+                <div id="result-register"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>5. Prueba de Sesión</h2>
+            <div class="test">
+                <button onclick="testSession()">Probar Sesión</button>
+                <button onclick="testLogout()">Probar Logout</button>
+                <div id="result-session"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>6. Inspeccionar localStorage</h2>
+            <div class="test">
+                <button onclick="showStorageData()">Ver Datos en localStorage</button>
+                <button onclick="clearStorage()">Limpiar localStorage</button>
+                <div id="result-storage"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>7. Estado Actual</h2>
+            <button onclick="showCurrentState()">Ver Estado Actual</button>
+            <div id="result-state"></div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        function displayResult(elementId, passed, message, data = null) {
+            const el = document.getElementById(elementId);
+            const className = passed ? 'pass' : 'fail';
+            let html = `<div class="test-result ${className}">${message}</div>`;
+            if (data) {
+                html += `<div class="data-display">${JSON.stringify(data, null, 2)}</div>`;
+            }
+            el.innerHTML = html;
+        }
+
+        function testInit() {
+            try {
+                window.Auth.initDemoUsers();
+                const users = window.Auth.getAllUsers();
+                const passed = users.length >= 2;
+                displayResult('result-init', passed, 
+                    passed ? '✓ Sistema inicializado correctamente' : '✗ Error en inicialización',
+                    { usuariosEnSistema: users.length, usuarios: users }
+                );
+            } catch (e) {
+                displayResult('result-init', false, `✗ Error: ${e.message}`);
+            }
+        }
+
+        function testPreloadedUsers() {
+            try {
+                const guestUser = window.Auth.getAllUsers().find(u => u.username === 'guest');
+                const adminUser = window.Auth.getAllUsers().find(u => u.username === 'admin');
+                const passed = guestUser && adminUser;
+                displayResult('result-preloaded', passed,
+                    passed ? '✓ Usuarios pre-cargados encontrados' : '✗ Faltan usuarios pre-cargados',
+                    { guest: guestUser, admin: adminUser }
+                );
+            } catch (e) {
+                displayResult('result-preloaded', false, `✗ Error: ${e.message}`);
+            }
+        }
+
+        function testLoginSuccess() {
+            try {
+                const result = window.Auth.login('guest', 'guest123');
+                const passed = result.success;
+                displayResult('result-login', passed,
+                    passed ? '✓ Login exitoso' : '✗ Login falló',
+                    result
+                );
+            } catch (e) {
+                displayResult('result-login', false, `✗ Error: ${e.message}`);
+            }
+        }
+
+        function testLoginFail() {
+            try {
+                const result = window.Auth.login('guest', 'contraseña_incorrecta');
+                const passed = !result.success;
+                displayResult('result-login', passed,
+                    passed ? '✓ Rechaza contraseña incorrecta' : '✗ Aceptó contraseña incorrecta',
+                    result
+                );
+            } catch (e) {
+                displayResult('result-login', false, `✗ Error: ${e.message}`);
+            }
+        }
+
+        function testRegister() {
+            try {
+                const result = window.Auth.register('testuser' + Date.now(), 'test@example.com', 'test1234');
+                const passed = result.success;
+                displayResult('result-register', passed,
+                    passed ? '✓ Registro exitoso' : '✗ Registro falló',
+                    { success: result.success, usuario: result.user }
+                );
+            } catch (e) {
+                displayResult('result-register', false, `✗ Error: ${e.message}`);
+            }
+        }
+
+        function testRegisterDuplicate() {
+            try {
+                // Intentar registrar guest que ya existe
+                const result = window.Auth.register('guest', 'otro@email.com', 'pass1234');
+                const passed = !result.success;
+                displayResult('result-register', passed,
+                    passed ? '✓ Rechaza usuario duplicado' : '✗ Permite usuario duplicado',
+                    { success: result.success, errors: result.errors }
+                );
+            } catch (e) {
+                displayResult('result-register', false, `✗ Error: ${e.message}`);
+            }
+        }
+
+        function testSession() {
+            try {
+                // Limpiar sesión primero
+                window.Auth.logout();
+                
+                // Hacer login
+                window.Auth.login('admin', 'admin123');
+                window.Auth.setSession('admin');
+                
+                // Verificar sesión
+                const session = window.Auth.getSession();
+                const isLogged = window.Auth.isLoggedIn();
+                const currentUser = window.Auth.getCurrentUser();
+                
+                const passed = session && isLogged && currentUser;
+                displayResult('result-session', passed,
+                    passed ? '✓ Sesión establecida correctamente' : '✗ Error en sesión',
+                    { session, isLogged, currentUser }
+                );
+            } catch (e) {
+                displayResult('result-session', false, `✗ Error: ${e.message}`);
+            }
+        }
+
+        function testLogout() {
+            try {
+                window.Auth.logout();
+                const session = window.Auth.getSession();
+                const isLogged = window.Auth.isLoggedIn();
+                
+                const passed = !session && !isLogged;
+                displayResult('result-session', passed,
+                    passed ? '✓ Logout exitoso' : '✗ Error en logout',
+                    { sessionAfterLogout: session, isLoggedAfterLogout: isLogged }
+                );
+            } catch (e) {
+                displayResult('result-session', false, `✗ Error: ${e.message}`);
+            }
+        }
+
+        function showStorageData() {
+            try {
+                const users = localStorage.getItem('healthup_users');
+                const session = localStorage.getItem('healthup_session');
+                const fitlife = localStorage.getItem('fitlife_logged');
+                
+                displayResult('result-storage', true, '📋 Datos en localStorage',
+                    {
+                        healthup_users: users ? JSON.parse(users) : null,
+                        healthup_session: session ? JSON.parse(session) : null,
+                        fitlife_logged: fitlife
+                    }
+                );
+            } catch (e) {
+                displayResult('result-storage', false, `✗ Error: ${e.message}`);
+            }
+        }
+
+        function clearStorage() {
+            if (confirm('¿Estás seguro? Esto borrará todos los datos de usuarios.')) {
+                localStorage.removeItem('healthup_users');
+                localStorage.removeItem('healthup_session');
+                localStorage.removeItem('fitlife_logged');
+                window.Auth.initPreloadedUsers();
+                displayResult('result-storage', true, '✓ localStorage limpiado y reinicializado');
+            }
+        }
+
+        function showCurrentState() {
+            try {
+                const isLogged = window.Auth.isLoggedIn();
+                const user = window.Auth.getCurrentUser();
+                const allUsers = window.Auth.getAllUsers();
+                
+                displayResult('result-state', true, isLogged ? '✓ Usuario logueado' : '⚪ Sin login',
+                    {
+                        logueado: isLogged,
+                        usuarioActual: user,
+                        totalUsuarios: allUsers.length
+                    }
+                );
+            } catch (e) {
+                displayResult('result-state', false, `✗ Error: ${e.message}`);
+            }
+        }
+
+        // Inicializar al cargar
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('✓ Página de test cargada. El módulo Auth está disponible como window.Auth');
+            testInit();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Premium | HealthUp</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="site-header sticky-header">
+        <div class="container header-inner">
+            <a href="index.html" class="logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+                <img src="img/logo.png" alt="HealthUp logo" style="height:38px;width:38px;vertical-align:middle;border-radius:8px;flex-shrink:0;">
+                <div style="display:flex;flex-direction:column;line-height:1;">
+                    <span style="font-weight:700;font-size:1.5rem;line-height:1;">HealthUp</span>
+                    <span class="tagline" style="font-size:0.95rem;color:#7bed9f;line-height:1.2;">Tu salud, tu plan — simple y accesible</span>
+                </div>
+            </a>
+            <nav class="main-nav" aria-label="Menú principal">
+                <button class="nav-toggle" aria-label="Abrir menú">&#9776;</button>
+                <ul>
+                    <li><a href="about.html">Sobre Nosotros</a></li>
+                    <li><a href="contact.html">Contacto</a></li>
+                    <li><a href="meal-plans.html">Planes</a></li>
+                    <li><a href="bodyfat.html">Calculadora de Grasa</a></li>
+                    <li><a href="upgrade.html">Premium</a></li>
+                </ul>
+            </nav>
+            <div class="auth" id="authArea">
+                <!-- El botón de login o el menú de usuario se inyectan por JS -->
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="payment-section">
+            <div class="container" style="max-width:720px;">
+                <h1>Pago simuladо - Premium</h1>
+                <p>Primer mes: <strong>$35 USD</strong> (cobro simulado). Luego $25/mes.</p>
+
+                <form id="paymentForm" style="display:flex;flex-direction:column;gap:12px;margin-top:18px;">
+                    <label>Nombre en la tarjeta
+                        <input type="text" id="cardName" required placeholder="Nombre como figura en la tarjeta">
+                    </label>
+
+                    <label>Número de tarjeta
+                        <input type="text" id="cardNumber" required placeholder="1111 2222 3333 4444" maxlength="19">
+                    </label>
+
+                    <div style="display:flex;gap:12px;">
+                        <label>Expiración
+                            <input type="text" id="cardExpiry" placeholder="MM/AA" required style="width:120px;">
+                        </label>
+                        <label>CVC
+                            <input type="text" id="cardCVC" placeholder="123" required style="width:100px;">
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;">
+                            <input type="radio" name="cardType" value="debit" checked> Débito
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;">
+                            <input type="radio" name="cardType" value="credit"> Crédito
+                        </label>
+                    </div>
+
+                    <div style="display:flex;gap:12px;">
+                        <button type="submit" class="button primary">Pagar $35 USD</button>
+                        <a href="upgrade.html" class="button">Volver</a>
+                    </div>
+
+                    <div id="paymentMsg" style="color:var(--accent)"></div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 HealthUp. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/scripts.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('paymentForm');
+            const msg = document.getElementById('paymentMsg');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
+                if (!user) {
+                    msg.innerText = 'Por favor inicia sesión antes de realizar el pago.';
+                    return;
+                }
+
+                // Validaciones básicas de campos
+                const name = document.getElementById('cardName').value.trim();
+                const number = document.getElementById('cardNumber').value.replace(/\s+/g, '');
+                const expiry = document.getElementById('cardExpiry').value.trim();
+                const cvc = document.getElementById('cardCVC').value.trim();
+                const type = document.querySelector('input[name="cardType"]:checked').value;
+
+                if (name.length < 3 || number.length < 12 || cvc.length < 3) {
+                    msg.innerText = 'Por favor completa los datos de la tarjeta correctamente.';
+                    return;
+                }
+
+                // Simular procesamiento
+                msg.innerText = 'Procesando pago...';
+                setTimeout(() => {
+                    console.log('Simulando pago para usuario:', user);
+                    // Crear comprobante
+                    const receipt = {
+                        username: user.username,
+                        email: user.email,
+                        amount: 35,
+                        currency: 'USD',
+                        method: type,
+                        cardLast4: number.slice(-4),
+                        date: new Date().toISOString(),
+                        description: 'Primer mes Premium - $35 USD'
+                    };
+                    // Guardar comprobante temporal
+                    try {
+                        localStorage.setItem('healthup_last_receipt', JSON.stringify(receipt));
+                    } catch (e) { console.error(e); }
+
+                    // Actualizar plan del usuario
+                    if (window.Auth && window.Auth.setUserPlan) {
+                        window.Auth.setUserPlan(user.username, 'pago');
+                    }
+
+                    // Redirigir al comprobante
+                    window.location.href = 'receipt.html';
+                }, 900);
+            });
+        });
+    </script>
+</body>
+</html>

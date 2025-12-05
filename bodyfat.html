@@ -19,10 +19,11 @@
             <nav class="main-nav" aria-label="Menú principal">
                 <button class="nav-toggle" aria-label="Abrir menú">&#9776;</button>
                 <ul>
-                    <li><a href="profile.html">Sobre Nosotros</a></li>
+                    <li><a href="about.html">Sobre Nosotros</a></li>
                     <li><a href="contact.html">Contacto</a></li>
                     <li><a href="meal-plans.html">Planes</a></li>
                     <li><a href="bodyfat.html">Calculadora de Grasa</a></li>
+                    <li><a href="upgrade.html">Premium</a></li>
                 </ul>
             </nav>
             <div class="auth" id="authArea">
@@ -71,15 +72,14 @@
             <p>&copy; 2025 HealthUp. Todos los derechos reservados.</p>
         </div>
     </footer>
+    <script src="js/auth.js"></script>
     <script src="js/scripts.js"></script>
     <script src="js/nav.js"></script>
     <script src="js/auth-modal.js"></script>
     <script>
         // Mostrar u ocultar calculadora según login
         function checkBodyfatAccess() {
-            const username = localStorage.getItem('fitlife_logged');
-            let users = JSON.parse(localStorage.getItem('fitlife_users') || '[]');
-            let user = users.find(u => u.username === username);
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
             const loggedDiv = document.getElementById('bodyfat-logged');
             const nologinDiv = document.getElementById('bodyfat-nologin');
             if (user) {
@@ -165,9 +165,7 @@
 
         function renderUserMenu() {
             const authArea = document.getElementById('authArea');
-            const username = localStorage.getItem('fitlife_logged');
-            let users = JSON.parse(localStorage.getItem('fitlife_users') || '[]');
-            let user = users.find(u => u.username === username);
+            const user = window.Auth && window.Auth.getCurrentUser ? window.Auth.getCurrentUser() : null;
             if (user) {
                 authArea.innerHTML = `
                     <div class="user-menu">
@@ -197,7 +195,9 @@
                     dropdown.style.display = 'none';
                 });
                 document.getElementById('logoutBtn').onclick = function() {
-                    localStorage.removeItem('fitlife_logged');
+                    if (window.Auth && window.Auth.logout) {
+                        window.Auth.logout();
+                    }
                     location.reload();
                 };
             } else {

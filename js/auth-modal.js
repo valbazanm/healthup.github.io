@@ -7,7 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="modal-close" id="closeModalBtn" aria-label="Cerrar">&times;</button>
                 <div id="loginFormBox">
                     <h2>Iniciar sesión</h2>
-                    <form class="auth-form" autocomplete="off">
+                    <div id="loginError" style="color:#ff6b6b;margin-bottom:12px;display:none;"></div>
+                    <form class="auth-form" id="loginForm" autocomplete="off">
                         <div class="form-row">
                             <label for="login-username">Usuario</label>
                             <input id="login-username" name="username" type="text" autocomplete="username" placeholder="Usuario">
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <label for="login-password">Contraseña</label>
                             <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Contraseña">
                         </div>
+                        <!-- credential hint removed for professional simulation -->
                         <div class="form-row">
                             <button type="submit" class="button primary" style="width:100%;">Ingresar</button>
                         </div>
@@ -31,25 +33,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const modal = document.getElementById('authModal');
-    const loginBtns = document.querySelectorAll('#loginBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
-    const loginBox = document.getElementById('loginFormBox');
-    const loginForm = modal ? modal.querySelector('.auth-form') : null;
+    const loginError = document.getElementById('loginError');
 
-    loginBtns.forEach(btn => {
-        btn.addEventListener('click', e => {
-            e.preventDefault();
-            modal.style.display = 'flex';
-            loginBox.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        });
+    // Abrir modal con click en botón de login (delegated - funciona aunque el botón se inyecte después)
+    document.addEventListener('click', function (e) {
+        const target = e.target.closest && e.target.closest('#loginBtn, .login-btn');
+        if (!target) return;
+        e.preventDefault();
+        if (!modal) return;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        if (loginError) loginError.style.display = 'none';
+        // Re-bind the login form handler each time modal opens to ensure it is attached
+        bindLoginForm();
     });
+
+    // Cerrar modal
     if (closeModalBtn) {
         closeModalBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
+            if (modal) modal.style.display = 'none';
             document.body.style.overflow = '';
         });
     }
+
+    // Cerrar modal al hacer click fuera
     if (modal) {
         modal.addEventListener('click', e => {
             if (e.target === modal) {
@@ -58,6 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Cerrar modal con ESC
     document.addEventListener('keydown', e => {
         if (e.key === "Escape" && modal && modal.style.display === 'flex') {
             modal.style.display = 'none';
@@ -65,23 +75,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Validar login contra localStorage
-    if (loginForm) {
-        loginForm.onsubmit = function(e) {
+    // Bind login form submit handler (safe to call multiple times)
+    function bindLoginForm() {
+        const loginForm = document.getElementById('loginForm');
+        if (!loginForm) return;
+        // Remove existing handler by cloning
+        const newForm = loginForm.cloneNode(true);
+        loginForm.parentNode.replaceChild(newForm, loginForm);
+
+        newForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            const username = loginForm.querySelector('#login-username').value.trim();
-            const password = loginForm.querySelector('#login-password').value;
-            let users = JSON.parse(localStorage.getItem('fitlife_users') || '[]');
-            const user = users.find(u => u.username === username && u.password === password);
-            if (user) {
-                alert('¡Bienvenido, ' + username + '!');
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
-                // Aquí podrías guardar el usuario logueado en localStorage/sessionStorage
-                localStorage.setItem('fitlife_logged', username);
-            } else {
-                alert('Usuario o contraseña incorrectos.');
+            const usernameEl = document.getElementById('login-username');
+            const passwordEl = document.getElementById('login-password');
+            const username = usernameEl ? usernameEl.value.trim() : '';
+            const password = passwordEl ? passwordEl.value : '';
+
+            // Validar login usando el módulo Auth
+            if (!window.Auth || !window.Auth.login) {
+                if (loginError) {
+                    loginError.textContent = 'Módulo de autenticación no disponible.';
+                    loginError.style.display = 'block';
+                }
+                return;
             }
-        };
+
+            const result = window.Auth.login(username, password);
+
+            if (result && result.success) {
+                // Establecer sesión
+                window.Auth.setSession(username);
+                // Mostrar mensaje de éxito
+                if (loginError) loginError.style.display = 'none';
+                alert('¡Bienvenido, ' + username + '!');
+                // Cerrar modal
+                if (modal) modal.style.display = 'none';
+                document.body.style.overflow = '';
+                // Recargar para actualizar el menú de usuario
+                setTimeout(() => { location.reload(); }, 300);
+            } else {
+                if (loginError) {
+                    loginError.textContent = (result && result.error) ? result.error : 'Error de autenticación';
+                    loginError.style.display = 'block';
+                }
+            }
+        });
     }
 });
